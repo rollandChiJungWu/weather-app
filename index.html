@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Weather App</title>
+  </head>
+
+  <style>
+    /* Add some basic styling to the form */
+    form {
+      margin: 20px;
+      padding: 20px;
+      background-color: #f2f2f2;
+      border-radius: 5px;
+    }
+    /* Style the label and input elements */
+    label, input {
+      margin: 10px;
+      padding: 5px;
+      font-size: 16px;
+    }
+    /* Style the submit button */
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    /* Style the weather display */
+    #weather {
+      margin: 20px;
+      padding: 20px;
+      background-color: #f2f2f2;
+      border-radius: 5px;
+      font-size: 18px;
+      text-align: center;
+    }
+  </style>
+
+  <body>
+    <div id="weather"></div>
+    <form>
+      <label>City:</label>
+      <input type="text" id="city" placeholder="Enter city name">
+      <button type="button" id="submitBtn" onclick="getWeather()">Submit</button>
+    </form>
+    
+    <script>
+      function getWeather() {
+        // Get city input from user
+        const city = document.getElementById("city").value;
+        // API endpoint for OpenWeather
+        const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=c360ddc9611e8c3aad30bb5fdeb199e2`;
+
+        // Check if weather data for this city is already stored in LocalStorage
+        const storedWeather = localStorage.getItem(`weather - ${ city }`);
+        if (storedWeather) {
+          // If data is stored, parse it and display it
+          const weatherData = JSON.parse(storedWeather);
+          displayWeather(weatherData);
+        } else {
+          // Get weather data from API
+          fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+              // Store data in LocalStorage
+              localStorage.setItem(`weather - ${ city }`, JSON.stringify(data));
+              // Display data on webpage
+              displayWeather(data);
+            })
+            .catch(error => console.error(error));
+        }
+      }
+
+      function displayWeather(data) {
+        // Get current temperature
+        const temp = data.main.temp;
+        // Get current weather condition
+        const condition = data.weather[0].main;
+        // Display data on webpage
+        document.getElementById("weather").innerHTML = `The temperature in ${ data.name } is ${ temp }°K and the weather is ${ condition }.`;
+      }
+    </script>
+  </body>
+</html>
